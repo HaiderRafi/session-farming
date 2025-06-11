@@ -20,7 +20,13 @@ INSTAGRAM_PASSWORD = "Aman@123"
 
 def download_and_extract_chromedriver():
     try:
-        download_url = "https://storage.googleapis.com/chrome-for-testing-public/137.0.7151.70/win64/chromedriver-win64.zip"
+        # For Linux systems (like Render)
+        download_url = "https://storage.googleapis.com/chrome-for-testing-public/137.0.7151.70/linux64/chromedriver-linux64.zip"
+        
+        # For local Windows development
+        if os.name == 'nt':
+            download_url = "https://storage.googleapis.com/chrome-for-testing-public/137.0.7151.70/win64/chromedriver-win64.zip"
+
         latest_driver_zip = wget.download(download_url, 'chromedriver.zip')
 
         def set_executable_permissions(file_path):
@@ -30,7 +36,13 @@ def download_and_extract_chromedriver():
         extracted_dir = os.getcwd()
         with zipfile.ZipFile(latest_driver_zip, 'r') as zip_ref:
             zip_ref.extractall(extracted_dir)
-            extracted_path = os.path.join(extracted_dir, 'chromedriver-win64', 'chromedriver.exe')
+            
+            # Handle different extracted paths based on OS
+            if os.name == 'nt':  # Windows
+                extracted_path = os.path.join(extracted_dir, 'chromedriver-win64', 'chromedriver.exe')
+            else:  # Linux/Mac
+                extracted_path = os.path.join(extracted_dir, 'chromedriver-linux64', 'chromedriver')
+                
             set_executable_permissions(extracted_path)
 
         os.remove(latest_driver_zip)
@@ -40,10 +52,6 @@ def download_and_extract_chromedriver():
         return None
 
 def setup_chrome_driver():
-    driver_path = download_and_extract_chromedriver()
-    if not driver_path or not os.path.exists(driver_path):
-        raise FileNotFoundError(f"ChromeDriver not found at path: {driver_path}")
-
     chrome_options = Options()
     chrome_options.add_argument("--headless=new")
     chrome_options.add_argument("--disable-gpu")
@@ -55,10 +63,18 @@ def setup_chrome_driver():
     chrome_options.add_argument("--window-size=1920,1080")
     chrome_options.add_argument("--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36")
 
-    service = ChromeService(executable_path=driver_path)
-    driver = webdriver.Chrome(service=service, options=chrome_options)
-    driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
+    # On Render, ChromeDriver is already installed at this path
+    if os.getenv('RENDER'):
+        driver = webdriver.Chrome(options=chrome_options)
+    else:
+        # Local development
+        driver_path = download_and_extract_chromedriver()
+        if not driver_path or not os.path.exists(driver_path):
+            raise FileNotFoundError(f"ChromeDriver not found at path: {driver_path}")
+        service = ChromeService(executable_path=driver_path)
+        driver = webdriver.Chrome(service=service, options=chrome_options)
 
+    driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
     return driver
 
 def wait_and_click(driver, by, value, timeout=10):

@@ -15,8 +15,8 @@ import uvicorn
 app = FastAPI(title="Instagram Session Extractor", version="1.0.0")
 
 # Instagram credentials
-INSTAGRAM_USERNAME = "dummarodum280"
-INSTAGRAM_PASSWORD = "Aman@123"
+INSTAGRAM_USERNAME = "may@grynowinternational.com"
+INSTAGRAM_PASSWORD = "SbqTxW.M)Au$fr2"
 
 def download_and_extract_chromedriver():
     try:

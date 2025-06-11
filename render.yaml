@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: instagram-session-service
+    env: python
+    buildCommand: |
+      apt-get update
+      apt-get install -y chromium-browser
+      pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port 10000
+    envVars:
+      - key: INSTAGRAM_USERNAME
+        value: dummarodum280
+      - key: INSTAGRAM_PASSWORD
+        value: Aman@123

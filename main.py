@@ -20,7 +20,7 @@ INSTAGRAM_PASSWORD = "Aman@123"
 
 def download_and_extract_chromedriver():
     try:
-        download_url = "https://storage.googleapis.com/chrome-for-testing-public/137.0.7151.70/linux64/chromedriver-linux64.zip"
+        download_url = "https://storage.googleapis.com/chrome-for-testing-public/137.0.7151.70/win64/chromedriver-win64.zip"
         latest_driver_zip = wget.download(download_url, 'chromedriver.zip')
 
         def set_executable_permissions(file_path):
@@ -30,7 +30,7 @@ def download_and_extract_chromedriver():
         extracted_dir = os.getcwd()
         with zipfile.ZipFile(latest_driver_zip, 'r') as zip_ref:
             zip_ref.extractall(extracted_dir)
-            extracted_path = os.path.join(extracted_dir, 'chromedriver-linux64', 'chromedriver')
+            extracted_path = os.path.join(extracted_dir, 'chromedriver-win64', 'chromedriver.exe')
             set_executable_permissions(extracted_path)
 
         os.remove(latest_driver_zip)
@@ -38,7 +38,6 @@ def download_and_extract_chromedriver():
     except Exception as e:
         print(f"Error downloading or extracting ChromeDriver: {e}")
         return None
-
 
 def setup_chrome_driver():
     driver_path = download_and_extract_chromedriver()
@@ -57,7 +56,6 @@ def setup_chrome_driver():
     chrome_options.add_argument("--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36")
 
     service = ChromeService(executable_path=driver_path)
-    chrome_options.binary_location = "/usr/bin/chromium-browser"
     driver = webdriver.Chrome(service=service, options=chrome_options)
     driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
 
@@ -232,3 +230,18 @@ def get_session_id():
             print("🔚 Closing browser...")
             driver.quit()
             print("✅ Cleanup complete!")
+
+if __name__ == "__main__":
+    print("🚀 Starting Instagram Session Extractor API...")
+    print("📡 Server will be available at: http://localhost:8000")
+    print("📚 API documentation at: http://localhost:8000/docs")
+    print("🔍 GET endpoint: http://localhost:8000/get_session_id")
+    print("\n" + "="*50 + "\n")
+    
+    uvicorn.run(
+        app, 
+        host="0.0.0.0", 
+        port=8000, 
+        log_level="info"
+    )
+

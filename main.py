@@ -46,7 +46,6 @@ def setup_chrome_driver():
         raise FileNotFoundError(f"ChromeDriver not found at path: {driver_path}")
 
     chrome_options = Options()
-    chrome_options.binary_location = "/usr/bin/chromium-browser"
     chrome_options.add_argument("--headless=new")
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--no-sandbox")
@@ -58,6 +57,7 @@ def setup_chrome_driver():
     chrome_options.add_argument("--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36")
 
     service = ChromeService(executable_path=driver_path)
+    chrome_options.binary_location = "/usr/bin/chromium-browser"
     driver = webdriver.Chrome(service=service, options=chrome_options)
     driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
 
